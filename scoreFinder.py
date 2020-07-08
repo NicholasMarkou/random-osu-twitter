@@ -6,9 +6,9 @@ import time
 import tweepy
 
 tokens = json.load(open('tokens.json'))
-osuToken = tokens['osu']
-auth = tweepy.OAuthHandler(tokens['tAPI'], tokens['tSecret'])
-auth.set_access_token(tokens['tAccess'], tokens['tAccessSecret'])
+osuToken = os.environ['osu']
+auth = tweepy.OAuthHandler(os.environ['tAPI'], os.environ['tSecret'])
+auth.set_access_token(os.environ['tAccess'], os.environ['tAccessSecret'])
 api = tweepy.API(auth)
 
 def findRandomMap(): #time is in epoch starting from ranked date in epoch of Disco Prince
