@@ -32,6 +32,8 @@ def findRandomScore(mapID):
     print(mapID)
     return data[random.randint(0,len(data)-1)]
 
-map = findRandomMap()
-score = findRandomScore(map)
-api.update_status(f"{score['username']} played {getTitle(map)} [{getDif(map)}] and got {score['pp']} pp on {score['date']} UTC.")
+while True:
+    map = findRandomMap()
+    score = findRandomScore(map)
+    api.update_status(f"{score['username']} played {getTitle(map)} [{getDif(map)}] and got {score['pp']} pp on {score['date']} UTC.")
+    time.sleep(3600)
