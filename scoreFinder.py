@@ -4,6 +4,7 @@ import datetime
 import random
 import time
 import tweepy
+import os
 
 osuToken = os.environ['osu']
 auth = tweepy.OAuthHandler(os.environ['tAPI'], os.environ['tSecret'])
