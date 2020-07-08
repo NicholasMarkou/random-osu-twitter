@@ -5,7 +5,6 @@ import random
 import time
 import tweepy
 
-tokens = json.load(open('tokens.json'))
 osuToken = os.environ['osu']
 auth = tweepy.OAuthHandler(os.environ['tAPI'], os.environ['tSecret'])
 auth.set_access_token(os.environ['tAccess'], os.environ['tAccessSecret'])
