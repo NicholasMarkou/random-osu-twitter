@@ -16,8 +16,6 @@ def findRandomMap(): #time is in epoch starting from ranked date in epoch of Dis
     beatmapsetID = requests.get(f"https://osu.ppy.sh/api/get_beatmaps?k={osuToken}&since={timeMap}&limit=1&m=0").json()[0]['beatmapset_id']
     data = requests.get(f"https://osu.ppy.sh/api/get_beatmaps?k={osuToken}&s={beatmapsetID}&m=0").json()
     data = data[random.randint(0,len(data)-1)]
-    title = data['title']
-    difficulty = data['version']
     return data['beatmap_id']
 
 def getTitle(mapID):
