@@ -16,15 +16,7 @@ class Score:
         userScore = requests.get(f"https://osu.ppy.sh/api/get_scores?k={Score.osuToken}&b={self.map['beatmap_id']}&limit=100").json()
         self.userScore = userScore[random.randint(0,len(data)-1)]
         self.player = requests.get(f"https://osu.ppy.sh/api/get_user?k={Score.osuToken}&u={self.userScore['user_id']}&type=id").json()[0]
-
-    def getTitle(self):
-        return self.map['title']
-
-    def getDif(self):
-        return self.map['version']
-
-    def getUser(self):
-        return self.userScore['username']
+        
     
     def getProfPicURL(self):
         return f"http://s.ppy.sh/a/{self.userScore['user_id']}"

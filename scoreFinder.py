@@ -5,33 +5,51 @@ import random
 import time
 import tweepy
 import os
+from PIL import Image, ImageOps, ImageFont, ImageDraw
+from Score import *
 
-osuToken = os.environ['osu']
 auth = tweepy.OAuthHandler(os.environ['tAPI'], os.environ['tSecret'])
 auth.set_access_token(os.environ['tAccess'], os.environ['tAccessSecret'])
 api = tweepy.API(auth)
 
-def findRandomMap(): #time is in epoch starting from ranked date in epoch of Disco Prince
-    timeMap = datetime.datetime.fromtimestamp(random.randint(1191692790,int(time.time())-86400)).strftime('%Y-%m-%d %H:%M:%S')
-    beatmapsetID = requests.get(f"https://osu.ppy.sh/api/get_beatmaps?k={osuToken}&since={timeMap}&limit=1&m=0").json()[0]['beatmapset_id']
-    data = requests.get(f"https://osu.ppy.sh/api/get_beatmaps?k={osuToken}&s={beatmapsetID}&m=0").json()
-    data = data[random.randint(0,len(data)-1)]
-    return data['beatmap_id']
-
-def getTitle(mapID):
-    return requests.get(f"https://osu.ppy.sh/api/get_beatmaps?k={osuToken}&b={mapID}").json()[0]['title']
-
-def getDif(mapID):
-    return requests.get(f"https://osu.ppy.sh/api/get_beatmaps?k={osuToken}&b={mapID}").json()[0]['version']
- 
-def findRandomScore(mapID):
-    data = requests.get(f"https://osu.ppy.sh/api/get_scores?k={osuToken}&b={mapID}&limit=100").json()
-    print(data)
-    print(mapID)
-    return data[random.randint(0,len(data)-1)]
+def shadowText(draw,x,y,text,font):
+    if x == 'center':
+        w,h=draw.textsize(text,font)
+        x=(900-w)/2
+    shadowcolor='black'
+    #Border
+    draw.text((x-1, y), text, font=font, fill=shadowcolor)
+    draw.text((x+1, y), text, font=font, fill=shadowcolor)
+    draw.text((x, y-1), text, font=font, fill=shadowcolor)
+    draw.text((x, y+1), text, font=font, fill=shadowcolor)
+    draw.text((x-1, y-1), text, font=font, fill=shadowcolor)
+    draw.text((x+1, y-1), text, font=font, fill=shadowcolor)
+    draw.text((x-1, y+1), text, font=font, fill=shadowcolor)
+    draw.text((x+1, y+1), text, font=font, fill=shadowcolor)
+    #white text
+    draw.text((x,y), text, font=font, fill=(255,255,255,255))
 
 while True:
-    map = findRandomMap()
-    score = findRandomScore(map)
-    api.update_status(f"{score['username']} played {getTitle(map)} [{getDif(map)}] and got {score['pp']} pp on {score['date']} UTC.")
+    randomScore = Score()
+    #Beatmap cover image
+    BCover = Image.open(requests.get(randomScore.getMapThumbnailURL(), stream=True).raw)
+    #Profile Picture
+    PPic = ImageOps.expand(Image.open(requests.get(randomScore.getProfPicURL(), stream=True).raw).resize((100,100)),border=3,fill=20)
+    BCover.paste(PPic, (10,10))
+    draw = ImageDraw.Draw(BCover)
+    shadowText(draw,10,115,randomScore.userScore['date'],ImageFont.truetype("arial.ttf", 20))
+    ranking=Image.open(f"mods/{randomScore.userScore['rank']}.png")
+    BCover.paste(ranking, (10,140),ranking)
+    shadowText(draw,124,5,randomScore.userScore['username'],ImageFont.truetype("arial.ttf", 22))
+    shadowText(draw,124,30,'#'+randomScore.player['pp_rank'],ImageFont.truetype("arial.ttf", 22))
+    shadowText(draw,124,55,'pp: '+randomScore.player['pp_raw'],ImageFont.truetype("arial.ttf", 22))
+    shadowText(draw,124,80,randomScore.player['accuracy'][0:5]+"%",ImageFont.truetype("arial.ttf", 22))
+    shadowText(draw,'center',185,f"{randomScore.map['artist']} - {randomScore.map['title']} [{randomScore.map['version']}]",ImageFont.truetype("arial.ttf", 24))
+    shadowText(draw,'center',210,'Mapped by '+randomScore.map['creator'],ImageFont.truetype("arial.ttf", 24))
+    shadowText(draw,800,5,randomScore.map['difficultyrating'][0:4]+'*',ImageFont.truetype("arial.ttf", 18))
+    shadowText(draw,800,30,'AR: '+randomScore.map['diff_approach'],ImageFont.truetype("arial.ttf", 18))
+    shadowText(draw,800,55,'OD: '+randomScore.map['diff_overall'],ImageFont.truetype("arial.ttf", 18))
+    shadowText(draw,800,80,randomScore.map['bpm']+' BPM',ImageFont.truetype("arial.ttf", 18))
+    BCover.save('score.png','png')
+    api.update_with_media('score.png', f"{randomScore.userScore['username']} played {randomScore.map['title']} [{randomScore.map['version']}] and got {randomScore.userScore['pp']} pp on {randomScore.userScore['date']} UTC.")
     time.sleep(3600)
