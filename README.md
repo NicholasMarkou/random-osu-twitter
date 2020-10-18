@@ -3,6 +3,6 @@ Tweets out a random score from osu on ranked maps.
 
 https://twitter.com/RandomOsuScores
 
-Example tweet as of 7/7/20
+Example tweet as of 10/18/20
 
-![](https://i.imgur.com/hvJMJF2.png)
+![](https://i.imgur.com/C9GgBUh.png)
